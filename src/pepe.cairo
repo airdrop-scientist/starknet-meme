@@ -31,7 +31,7 @@ mod Pepe {
     use zeroable::Zeroable;
     use starknet::contract_address::ContractAddressZeroable;
 
-    const DECIMAL_PART: u128 = 1000000000000000000_u128;
+    const DECIMAL_PART: u128 = 400000000000000000_u128;
 
     // mint arguments, with below values, the halve time will be about 231 days 
     const BLOCK_TIME: u64 = 50_u64; // seconds

@@ -5,12 +5,4 @@ This is an ERC-20 contract modified according to OpenZeppelin's [implementation]
 -  Anyone can call the apply_mint function to mint candidates for free.
 -  Every 50 seconds can call a mint and get fixed coin.
 -  Coin will be halved after every 400,000 blocks.
--  The total number of tokens is 10,000,000,000, then mint will stop.
-
-## Development
-
-- - Install [cairo-v1.1.1](https://github.com/starkware-libs/cairo/tree/v1.1.1).
-- 
-- - Set `cairo-test`, `cairo-format` and `starknet-compile` in your $PATH.
-- 
-- Run command in [Makefile](https://github.com/superWifi/starknet-pepe/blob/master/Makefile).
+-  The total number of tokens is 4,000,000,000, then mint will stop.

@@ -586,3 +586,63 @@ fn test__burn_from_zero() {
 
     Pepe::_burn(zero_address, amount);
 }
+
+#[test]
+#[available_gas(20000000)]
+fn test__try_mint() {
+    Pepe::constructor(NAME, SYMBOL);
+
+    let minter: ContractAddress = contract_address_const::<1>();
+    let minter2: ContractAddress = contract_address_const::<2>();
+
+    let mint_count = Pepe::mint_count();
+
+    // no candidates
+    Pepe::_try_mint();
+    assert(Pepe::mint_count() == mint_count, 'Should eq 0');
+
+    // no available_count
+    assert(Pepe::available_mint_count() == 0_u64, 'availeble_mint_count eq 0');
+    Pepe::_add_candidate(minter);
+    Pepe::_try_mint();
+    assert(Pepe::balanceOf(minter) == 0, 'Should eq 0');
+    assert(Pepe::mint_count() == mint_count, 'Should eq 0');
+
+    let cur_block_timestamp = get_block_timestamp();
+    set_block_timestamp(cur_block_timestamp + Pepe::block_time());
+
+    // 1 candidate and 1 available_mint_count
+    let block_reward = Pepe::block_reward();
+    assert(Pepe::mint_candidates_count() == 1, 'Should eq 1');
+    assert(Pepe::available_mint_count() == 1, 'availeble_mint_count eq 1');
+    Pepe::_try_mint();
+    assert(Pepe::mint_candidates_count() == 0, 'Should eq 1');
+    assert(Pepe::available_mint_count() == 0, 'availeble_mint_count eq 0');
+    assert(Pepe::balanceOf(minter) == block_reward, 'mint award');
+    assert(Pepe::mint_candidates_count() == 0, 'Should eq 0');
+
+    // 2 candidate and 1 available_mint_count
+    let cur_block_timestamp = get_block_timestamp();
+    set_block_timestamp(cur_block_timestamp + Pepe::block_time());
+    assert(Pepe::available_mint_count() == 1, 'availeble_mint_count eq 1');
+
+    Pepe::_add_candidate(minter);
+    Pepe::_add_candidate(minter2);
+    assert(Pepe::mint_candidates_count() == 2, 'Should eq 2');
+    Pepe::_try_mint();
+    assert(Pepe::balanceOf(minter) + Pepe::balanceOf(minter2) == block_reward * 2, 'mint award');
+    assert(Pepe::mint_candidates_count() == 0, 'Should eq 0');
+
+    // 2 candidate and 3 available_count
+    let cur_block_timestamp = get_block_timestamp();
+    set_block_timestamp(cur_block_timestamp + Pepe::block_time() * 3);
+    assert(Pepe::available_mint_count() == 3, 'availeble_mint_count eq 3');
+
+    Pepe::_add_candidate(minter);
+    Pepe::_add_candidate(minter2);
+    assert(Pepe::mint_candidates_count() == 2, 'Should eq 2');
+    Pepe::_try_mint();
+    assert(Pepe::balanceOf(minter) + Pepe::balanceOf(minter2) == block_reward * 4, 'mint award');
+
+    assert(Pepe::totalSupply() == block_reward * 4, 'Should eq total supply');
+}
